@@ -142,6 +142,42 @@ class ZTokens extends ThemeExtension<ZTokens> {
     usageChart3: Color(0xFF9E77ED),
   );
 
+  /// OLED variant of [dark]: the large surfaces go to true black so AMOLED
+  /// panels can turn their pixels off; hierarchy comes from the borders and
+  /// the remaining dark-grey cards instead of grey backgrounds.
+  static const darkOled = ZTokens(
+    background: Color(0xFF000000),
+    panel: Color(0xFF000000),
+    sidebar: Color(0xFF000000),
+    surface: Color(0x0DFFFFFF),
+    surfaceHover: Color(0x1AFFFFFF),
+    card: Color(0xFF101010),
+    popover: Color(0xFF101010),
+    input: Color(0xFF101010),
+    menuHover: Color(0xFF1C1C1C),
+    primary: Color(0xFFFFFFFF),
+    primaryForeground: Color(0xFF000000),
+    secondary: Color(0xFF1C1C1C),
+    border: Color(0x1AFFFFFF),
+    borderHover: Color(0x26FFFFFF),
+    hover: Color(0x0DFFFFFF),
+    selected: Color(0x1AFFFFFF),
+    foreground: _neutral300,
+    foregroundSubtle: Color(0x99D4D4D4),
+    foregroundSubtlest: Color(0x4DD4D4D4),
+    success: Color(0xFF46BF72),
+    warning: Color(0xFFFF8A30),
+    destructive: Color(0xFFFF5C5C),
+    confirmSurface: Color(0x2946BF72),
+    confirmForeground: Color(0xFF87D9A4),
+    accent: Color(0xFF001D3D),
+    link: Color(0xFF80BEFF),
+    tag: Color(0xFF1C1C1C),
+    codeBackground: Color(0xFF0C0C0C),
+    usageChart: Color(0xFF4099FF),
+    usageChart3: Color(0xFF7B5CE5),
+  );
+
   @override
   ZTokens copyWith() => this;
 
@@ -175,8 +211,10 @@ extension ZThemeContext on BuildContext {
   ZTokens get z => Theme.of(this).extension<ZTokens>()!;
 }
 
-ThemeData buildZTheme(Brightness brightness) {
-  final z = brightness == Brightness.dark ? ZTokens.dark : ZTokens.light;
+ThemeData buildZTheme(Brightness brightness, {bool oled = false}) {
+  final z = brightness != Brightness.dark
+      ? ZTokens.light
+      : (oled ? ZTokens.darkOled : ZTokens.dark);
   final base = ThemeData(
     brightness: brightness,
     useMaterial3: true,

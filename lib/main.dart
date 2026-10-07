@@ -26,11 +26,12 @@ class CodezzApp extends StatelessWidget {
         title: 'Codezz',
         debugShowCheckedModeBanner: false,
         theme: buildZTheme(Brightness.light),
-        darkTheme: buildZTheme(Brightness.dark),
+        darkTheme:
+            buildZTheme(Brightness.dark, oled: app.themeMode == AppThemeMode.oled),
         themeMode: switch (app.themeMode) {
           AppThemeMode.system => ThemeMode.system,
           AppThemeMode.light => ThemeMode.light,
-          AppThemeMode.dark => ThemeMode.dark,
+          AppThemeMode.dark || AppThemeMode.oled => ThemeMode.dark,
         },
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: const [Locale('zh'), Locale('en')],

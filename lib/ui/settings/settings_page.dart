@@ -57,6 +57,7 @@ class SettingsPage extends StatelessWidget {
                       ButtonSegment(value: AppThemeMode.system, label: Text(s.themeSystem)),
                       ButtonSegment(value: AppThemeMode.light, label: Text(s.themeLight)),
                       ButtonSegment(value: AppThemeMode.dark, label: Text(s.themeDark)),
+                      ButtonSegment(value: AppThemeMode.oled, label: Text(s.themeOled)),
                     ],
                     selected: {app.themeMode},
                     onSelectionChanged: (v) => app.setThemeMode(v.first),

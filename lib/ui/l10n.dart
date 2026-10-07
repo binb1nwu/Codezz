@@ -339,6 +339,7 @@ class S {
   String get themeSystem => _('跟随系统', 'System');
   String get themeLight => _('浅色', 'Light');
   String get themeDark => _('深色', 'Dark');
+  String get themeOled => _('OLED 黑', 'OLED');
   String get textSize => _('字体大小', 'Text size');
   String get contextDisplay => _('上下文用量', 'Context usage');
   String get contextDisplayRing => _('圆环', 'Ring');

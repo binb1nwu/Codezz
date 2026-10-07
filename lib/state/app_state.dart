@@ -10,7 +10,7 @@ import 'log_store.dart';
 
 const appVersion = '1.0.0';
 
-enum AppThemeMode { system, light, dark }
+enum AppThemeMode { system, light, dark, oled }
 
 /// How the composer shows the context window: the toolbar ring, or the
 /// whole input box filling up like a progress bar.
