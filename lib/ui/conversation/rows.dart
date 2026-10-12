@@ -7,6 +7,7 @@ import '../theme/tokens.dart';
 import '../widgets/common.dart';
 import '../widgets/expand_anchor.dart';
 import '../widgets/markdown_view.dart';
+import '../side_pane/file_preview.dart';
 import 'tool_details.dart';
 import 'turn_model.dart';
 
@@ -382,10 +383,17 @@ class _ToolCallRowState extends State<ToolCallRow> {
     final expandable = family != ToolFamily.explore;
     final open = _open && expandable;
     final todos = family == ToolFamily.todo ? parseTodos(row) : const <TodoEntry>[];
+    // As in ZCode, tapping a Read call opens its file in the code viewer.
+    final readPath = family == ToolFamily.explore ? toolFilePath(row) : null;
+    final files = FileLinkScope.maybeOf(context);
     return ExpandAnchor(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       InkWell(
         borderRadius: BorderRadius.circular(ZRadius.md),
-        onTap: expandable ? () => toggleInPlace(context, () => setState(() => _open = !_open)) : null,
+        onTap: expandable
+            ? () => toggleInPlace(context, () => setState(() => _open = !_open))
+            : readPath != null && files != null
+                ? () => files.onOpen(readPath)
+                : null,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5),
           child: Row(children: [

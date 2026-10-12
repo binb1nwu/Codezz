@@ -7,6 +7,7 @@ import 'package:codezz/state/app_state.dart';
 import 'package:codezz/state/device_session.dart';
 import 'package:codezz/state/side_pane.dart';
 import 'package:codezz/ui/conversation/rows.dart';
+import 'package:codezz/ui/conversation/timeline.dart';
 import 'package:codezz/ui/home/task_notifications.dart';
 import 'package:codezz/ui/l10n.dart';
 import 'package:codezz/ui/side_pane/side_pane_view.dart';
@@ -227,6 +228,34 @@ void main() {
     await tester.pump();
     expect(find.byType(ShellDetails), findsNothing);
     expect(tester.getTopLeft(find.text('Bash')).dy, closeTo(before, 0.5));
+  });
+
+  group('turn duration', () {
+    Widget label(TurnDurationLabel l) => app(Scaffold(body: l));
+
+    testWidgets('uses the desktop duration when it has one', (tester) async {
+      await tester.pumpWidget(label(const TurnDurationLabel(running: true, durationMs: 65000, startedAt: 0)));
+      expect(find.text('Working for 1m 5s'), findsOneWidget);
+      await tester.pumpWidget(label(const TurnDurationLabel(running: false, durationMs: 65000)));
+      expect(find.text('Worked for 1m 5s'), findsOneWidget);
+    });
+
+    testWidgets('counts up from the start while running without one', (tester) async {
+      var now = DateTime.fromMillisecondsSinceEpoch(1000000 + 12000);
+      await tester.pumpWidget(label(TurnDurationLabel(running: true, startedAt: 1000000, now: () => now)));
+      expect(find.text('Working for 12s'), findsOneWidget);
+      now = now.add(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.text('Working for 13s'), findsOneWidget);
+      // Finished: the ticker stops and the final duration shows.
+      await tester.pumpWidget(label(const TurnDurationLabel(running: false, durationMs: 14000, startedAt: 1000000)));
+      expect(find.text('Worked for 14s'), findsOneWidget);
+    });
+
+    testWidgets('without any timing a running turn just says working', (tester) async {
+      await tester.pumpWidget(label(const TurnDurationLabel(running: true)));
+      expect(find.text('Working'), findsOneWidget);
+    });
   });
 
   test('the open task survives a restart', () async {

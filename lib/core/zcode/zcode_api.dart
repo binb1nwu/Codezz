@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import '../rpc/channel_client.dart';
 import 'server_info.dart';
@@ -287,6 +288,38 @@ class ZCodeApi {
   // ── composer "add context" sources ──
 
   /// `[{name, path, relativePath, type: file|directory}]`.
+  /// `{content, isBinary, truncated}`: up to [length] bytes of a text file
+  /// (ZCode's code viewer reads 256 KB).
+  Future<Map<String, dynamic>> readTextFile(String path, {int offset = 0, int length = 262144}) async =>
+      Map<String, dynamic>.from(
+          await _call<Map>(file, 'readTextFile', [
+        {'path': path, 'offset': offset, 'length': length}
+      ]));
+
+  /// `{mediaType, dataBase64}` of an image.
+  Future<Map<String, dynamic>> readMediaPreview(String path) async =>
+      Map<String, dynamic>.from(await _call<Map>(file, 'readMediaPreview', [
+        {'path': path}
+      ]));
+
+  /// `{type: file|directory, size?}`.
+  Future<Map<String, dynamic>> statFile(String path) async =>
+      Map<String, dynamic>.from(await _call<Map>(file, 'stat', [
+        {'path': path}
+      ]));
+
+  /// Raw bytes of `[offset, offset + length)`; empty at the end of the file.
+  Future<Uint8List> readFileRange(String path, int offset, int length) async {
+    final res = await _call<Object?>(file, 'readFileRange', [
+      {'path': path, 'offset': offset, 'length': length}
+    ]);
+    return switch (res) {
+      Uint8List b => b,
+      List l => Uint8List.fromList(l.cast<int>()),
+      _ => Uint8List(0),
+    };
+  }
+
   Future<List<Map<String, dynamic>>> listWorkspaceFiles(WorkspaceRef ws) async {
     final res = await _call<List>(file, 'listWorkspaceFiles', [
       {'rootPath': ws.path}

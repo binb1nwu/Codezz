@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../l10n.dart';
 import '../theme/tokens.dart';
+import '../side_pane/file_preview.dart';
 import '../widgets/common.dart';
 import '../widgets/expand_anchor.dart';
 
@@ -171,7 +172,10 @@ class ToolDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final body = switch (family) {
       ToolFamily.shell => ShellDetails(row: row),
-      ToolFamily.write when diff != null => DiffView(display: diff!),
+      ToolFamily.write when diff != null => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          DiffView(display: diff!),
+          _OpenFileLink(path: toolFilePath(row)),
+        ]),
       ToolFamily.todo when parseTodos(row).isNotEmpty => TodoDetails(todos: parseTodos(row)),
       _ => GenericDetails(row: row),
     };
@@ -538,6 +542,46 @@ class DiffView extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: SingleChildScrollView(
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [gutter, Expanded(child: body)]),
+      ),
+    );
+  }
+}
+
+/// The desktop path a file tool call works on.
+String? toolFilePath(Map<String, dynamic> row) {
+  final input = row['input'];
+  if (input is! Map) return null;
+  for (final key in const ['file_path', 'filePath', 'path', 'notebook_path']) {
+    final v = input[key];
+    if (v is String && v.trim().isNotEmpty) return v.trim();
+  }
+  return null;
+}
+
+/// "Open file" under an Edit / Write diff: the whole file in the code viewer.
+class _OpenFileLink extends StatelessWidget {
+  const _OpenFileLink({required this.path});
+  final String? path;
+
+  @override
+  Widget build(BuildContext context) {
+    final path = this.path;
+    final files = FileLinkScope.maybeOf(context);
+    if (path == null || files == null) return const SizedBox.shrink();
+    final z = context.z;
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(ZRadius.md),
+        onTap: () => files.onOpen(path),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(S.of(context).openFile, style: TextStyle(fontSize: ZText.sm, color: z.foregroundSubtle)),
+            const SizedBox(width: 2),
+            Icon(Icons.open_in_new_rounded, size: 13, color: z.foregroundSubtle),
+          ]),
+        ),
       ),
     );
   }

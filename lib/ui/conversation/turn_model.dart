@@ -19,6 +19,9 @@ class TurnGroup {
   bool get failed => header?['state'] == 'failed';
   bool get interrupted => header?['state'] == 'completedInterrupted';
 
+  /// When the turn started (epoch ms), if the desktop said.
+  int? get startedAt => (header?['startedAt'] as num?)?.toInt();
+
   int? get durationMs {
     final h = header;
     if (h == null) return null;

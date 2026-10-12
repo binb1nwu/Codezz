@@ -10,6 +10,7 @@ import '../../state/device_session.dart';
 import '../../state/model_catalog.dart';
 import '../l10n.dart';
 import '../theme/tokens.dart';
+import '../side_pane/file_preview.dart';
 import '../widgets/common.dart';
 import '../widgets/glass.dart';
 import '../widgets/tucked_below.dart';
@@ -181,9 +182,14 @@ class _ConversationViewState extends State<ConversationView> {
 
   @override
   Widget build(BuildContext context) {
-    final conversation = ListenableBuilder(
-      listenable: Listenable.merge([_store, widget.device]),
-      builder: (context, _) => _build(context),
+    // File names and local links open in the side pane's code viewer.
+    final conversation = FileLinkScope(
+      root: widget.workspace.workspace.path,
+      onOpen: widget.workspace.sidePane.openFile,
+      child: ListenableBuilder(
+        listenable: Listenable.merge([_store, widget.device]),
+        builder: (context, _) => _build(context),
+      ),
     );
     // Back closes the expanded status panel before it leaves the app.
     return ValueListenableBuilder<bool>(

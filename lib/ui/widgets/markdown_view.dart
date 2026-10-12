@@ -5,6 +5,7 @@ import 'package:markdown/markdown.dart' as md;
 
 import '../l10n.dart';
 import '../theme/tokens.dart';
+import '../side_pane/file_preview.dart';
 import 'common.dart';
 
 /// Assistant/user Markdown with ZCode's reading hierarchy: body `ui-base`,
@@ -71,6 +72,10 @@ class MarkdownView extends StatelessWidget {
       extensionSet: md.ExtensionSet.gitHubWeb,
       builders: {'pre': _CodeBlockBuilder()},
       softLineBreak: true,
+      // Local paths open in the code viewer; web links are left alone.
+      onTapLink: (_, href, __) {
+        if (href != null) FileLinkScope.maybeOf(context)?.openLink(href);
+      },
     );
   }
 }

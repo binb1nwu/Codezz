@@ -152,22 +152,35 @@ class TerminalSession extends ChangeNotifier {
   }
 }
 
-enum SidePaneKind { review, terminal }
+enum SidePaneKind { review, terminal, file }
 
 class SidePaneTab {
   SidePaneTab.review()
       : id = 'review',
         kind = SidePaneKind.review,
         title = '',
+        terminal = null,
+        path = null;
+  SidePaneTab.terminal(this.id, this.title, TerminalSession this.terminal)
+      : kind = SidePaneKind.terminal,
+        path = null;
+
+  /// ZCode's code viewer: one tab per file path.
+  SidePaneTab.file(String this.path, this.title)
+      : id = 'file:$path',
+        kind = SidePaneKind.file,
         terminal = null;
-  SidePaneTab.terminal(this.id, this.title, TerminalSession this.terminal) : kind = SidePaneKind.terminal;
 
   final String id;
   final SidePaneKind kind;
 
-  /// Terminal tabs only: the cwd's base name, numbered when repeated.
+  /// Terminal tabs: the cwd's base name, numbered when repeated; file
+  /// tabs: the file name.
   final String title;
   final TerminalSession? terminal;
+
+  /// File tabs only: the file's absolute path on the desktop.
+  final String? path;
 }
 
 /// ZCode's side pane on phones: an overlay with Review and Terminal tabs.
@@ -202,6 +215,14 @@ class SidePane extends ChangeNotifier {
             'terminal:${_terminalSeq++}', title, TerminalSession(api: api, cwd: cwd, texts: texts));
         tabs.add(tab);
         activeId = tab.id;
+        visible = true;
+      });
+
+  /// Previews [path] (reusing its tab if open) and shows the pane.
+  void openFile(String path) => _set(() {
+        final id = 'file:$path';
+        if (!tabs.any((t) => t.id == id)) tabs.add(SidePaneTab.file(path, _basename(path)));
+        activeId = id;
         visible = true;
       });
 

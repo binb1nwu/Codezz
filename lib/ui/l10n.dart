@@ -98,6 +98,7 @@ class S {
   String get thought => _('思考', 'Thought');
   String workedFor(String d) => _('已工作 $d', 'Worked for $d');
   String get working => _('工作中', 'Working');
+  String workingFor(String d) => _('工作中 $d', 'Working for $d');
   String get scrollToBottom => _('滚动到底部', 'Scroll to bottom');
   String get loadOlder => _('加载更早的消息', 'Load earlier messages');
   String get loadingConversation => _('正在加载会话…', 'Loading conversation…');
@@ -281,6 +282,36 @@ class S {
   String get toolDenied => _('已拒绝', 'Denied');
   String get toolStopped => _('已停止', 'Stopped');
   String get toolPending => _('等待确认', 'Awaiting approval');
+  // codeViewer.* in ZCode
+  String get more => _('更多', 'More');
+  String get openFile => _('打开文件', 'Open file');
+  String get markdownSource => _('显示源码', 'Show source');
+  String get wrapLines => _('自动换行', 'Wrap lines');
+  String get copyAbsolutePath => _('复制绝对路径', 'Copy absolute path');
+  String get copyRelativePath => _('复制相对路径', 'Copy relative path');
+  String get loadingFile => _('正在读取文件...', 'Loading file...');
+  String get loadingImage => _('正在加载图片预览...', 'Loading image preview...');
+  String get loadingMedia => _('正在加载媒体预览...', 'Loading media preview...');
+  String get fileMissing =>
+      _('文件不存在，或当前环境无法访问该路径。', 'The file does not exist, or this environment cannot access that path.');
+  String get fileTooLarge => _('文件超过 256 KB 预览上限，请使用其他编辑器打开以查看完整内容。',
+      'This file exceeds the 256 KB preview limit. Open it in another editor to view the full contents.');
+  String get binaryFile => _('当前文件看起来像二进制内容，暂不支持代码预览。',
+      'This file looks like binary data and cannot be previewed as code yet.');
+  String get emptyFile => _('文件为空', 'File is empty');
+  String get imageUnavailable => _('暂时无法显示这张图片。', 'This image preview is currently unavailable.');
+  String get mediaUnsupported => _('当前环境不支持播放这种媒体格式。', 'This environment cannot play this media format.');
+  String get mediaLoadFailed => _('媒体加载失败，请稍后重试或使用外部应用打开。',
+      'Media failed to load. Try again later or open it in an external application.');
+  String get mediaTooLarge => _('媒体文件超过 300 MB，无法在手机上预览。', 'This media file is over 300 MB and cannot be previewed on the phone.');
+  String get pdfUnavailable => _('暂时无法预览这个 PDF。', 'This PDF preview is currently unavailable.');
+  String get officeUnavailable => _('暂时无法预览这个 Office 文件。', 'This Office file cannot be previewed.');
+  String get loadingPdf => _('正在加载 PDF...', 'Loading PDF...');
+  String get loadingPptx => _('正在加载演示文稿...', 'Loading presentation...');
+  String get pptxLoadError => _('演示文稿加载失败', 'Failed to load presentation');
+  String get documentTooLarge =>
+      _('文件超过 64 MB，无法在手机上预览。', 'This file is over 64 MB and cannot be previewed on the phone.');
+
   // chat.toolCall.* in ZCode
   String get todoKind => _('待办', 'Todo');
   String get noOutput => _('没有输出。', 'No output.');

@@ -5,6 +5,7 @@ import '../../state/side_pane.dart';
 import '../l10n.dart';
 import '../theme/tokens.dart';
 import '../widgets/common.dart';
+import 'file_preview.dart';
 import 'review_view.dart';
 import 'terminal_tab.dart';
 
@@ -194,6 +195,8 @@ class _Panel extends StatelessWidget {
             child: switch (active) {
               null => _OpenTab(choices: choices),
               final t when t.kind == SidePaneKind.review => ReviewView(workspace: workspace),
+              final t when t.kind == SidePaneKind.file => FilePreview(
+                  key: ValueKey(t.id), api: workspace.api, path: t.path!, root: workspace.workspace.path),
               final t => TerminalTab(key: ValueKey(t.id), session: t.terminal!),
             },
           ),
@@ -234,7 +237,14 @@ class _TabChip extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(left: 8),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(tab.kind == SidePaneKind.review ? reviewIcon : terminalIcon, size: 14, color: color),
+              Icon(
+                  switch (tab.kind) {
+                    SidePaneKind.review => reviewIcon,
+                    SidePaneKind.terminal => terminalIcon,
+                    SidePaneKind.file => previewIcon(tab.path!),
+                  },
+                  size: 14,
+                  color: color),
               const SizedBox(width: 6),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 120),

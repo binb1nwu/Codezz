@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../core/v4/conversation_store.dart';
@@ -39,27 +42,25 @@ class _TurnViewState extends State<TurnView> {
             padding: const EdgeInsets.only(bottom: 12),
             child: UserBubble(row: input, store: widget.store),
           ),
-        if (turn.work.isNotEmpty) ...[
+        // As in ZCode, a running turn always has its header, counting up.
+        if (turn.work.isNotEmpty || running)
           InkWell(
             borderRadius: BorderRadius.circular(ZRadius.md),
-            onTap: () => toggleInPlace(context, () => setState(() => _expanded = !expanded)),
+            onTap: turn.work.isEmpty
+                ? null
+                : () => toggleInPlace(context, () => setState(() => _expanded = !expanded)),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(children: [
-                if (running) ...[const ZSpinner(size: 11), const SizedBox(width: 6)],
-                Text(
-                  running
-                      ? s.working
-                      : duration != null && duration > 0
-                          ? s.workedFor(formatDuration(duration))
-                          : s.workedFor('<1s'),
-                  style: TextStyle(fontSize: ZText.sm, color: z.foregroundSubtle),
-                ),
-                Icon(expanded ? Icons.expand_more : Icons.chevron_right,
-                    size: 15, color: z.foregroundSubtlest),
+                // No spinner here: the running row at the bottom has it.
+                TurnDurationLabel(running: running, durationMs: duration, startedAt: turn.startedAt),
+                if (turn.work.isNotEmpty)
+                  Icon(expanded ? Icons.expand_more : Icons.chevron_right,
+                      size: 15, color: z.foregroundSubtlest),
               ]),
             ),
           ),
+        if (turn.work.isNotEmpty) ...[
           if (expanded)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
@@ -201,6 +202,77 @@ class _TimelineState extends State<Timeline> {
           );
         },
       ),
+    );
+  }
+}
+
+
+/// ZCode's turn header text: "Working for 12s" while running, "Worked for
+/// 1m 5s" after. The duration is the desktop's `activeMs` (or end − start);
+/// while a turn runs without one, it counts up from [startedAt] each second,
+/// as ZCode does with its clock.
+class TurnDurationLabel extends StatefulWidget {
+  const TurnDurationLabel({super.key, required this.running, this.durationMs, this.startedAt, this.now});
+  final bool running;
+  final int? durationMs;
+  final int? startedAt;
+
+  /// Clock override for tests.
+  final DateTime Function()? now;
+
+  @override
+  State<TurnDurationLabel> createState() => _TurnDurationLabelState();
+}
+
+class _TurnDurationLabelState extends State<TurnDurationLabel> {
+  Timer? _ticker;
+
+  bool get _counting => widget.running && widget.durationMs == null && widget.startedAt != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _sync();
+  }
+
+  @override
+  void didUpdateWidget(covariant TurnDurationLabel old) {
+    super.didUpdateWidget(old);
+    _sync();
+  }
+
+  void _sync() {
+    if (_counting) {
+      _ticker ??= Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+    } else {
+      _ticker?.cancel();
+      _ticker = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    var ms = widget.durationMs;
+    if (ms == null && _counting) {
+      // The desktop's clock may run a little ahead of the phone's.
+      ms = math.max(0, (widget.now ?? DateTime.now)().millisecondsSinceEpoch - widget.startedAt!);
+    }
+    final d = ms == null ? null : (ms < 1000 ? '<1s' : formatDuration(ms));
+    return Text(
+      switch ((widget.running, d)) {
+        (true, final d?) => s.workingFor(d),
+        (true, null) => s.working,
+        (false, final d?) => s.workedFor(d),
+        _ => s.workedFor('<1s'),
+      },
+      style: TextStyle(fontSize: ZText.sm, color: context.z.foregroundSubtle),
     );
   }
 }
