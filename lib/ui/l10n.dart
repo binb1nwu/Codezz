@@ -306,6 +306,11 @@ class S {
   String get mediaTooLarge => _('媒体文件超过 300 MB，无法在手机上预览。', 'This media file is over 300 MB and cannot be previewed on the phone.');
   String get pdfUnavailable => _('暂时无法预览这个 PDF。', 'This PDF preview is currently unavailable.');
   String get officeUnavailable => _('暂时无法预览这个 Office 文件。', 'This Office file cannot be previewed.');
+  String get cardPresentation => _('演示文稿', 'Presentation');
+  String get cardDocument => _('Word 文档', 'Word document');
+  String get cardWorkbook => _('Excel 表格', 'Excel spreadsheet');
+  String get cardVideo => _('视频', 'Video');
+  String get cardAudio => _('音频', 'Audio');
   String get loadingPdf => _('正在加载 PDF...', 'Loading PDF...');
   String get loadingPptx => _('正在加载演示文稿...', 'Loading presentation...');
   String get pptxLoadError => _('演示文稿加载失败', 'Failed to load presentation');

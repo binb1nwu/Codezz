@@ -8,6 +8,7 @@ import '../widgets/common.dart';
 import '../widgets/expand_anchor.dart';
 import '../widgets/markdown_view.dart';
 import '../side_pane/file_preview.dart';
+import 'preview_cards.dart';
 import 'tool_details.dart';
 import 'turn_model.dart';
 
@@ -168,7 +169,8 @@ class AssistantText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final z = context.z;
-    final text = row['text'] as String? ?? '';
+    final raw = row['text'] as String? ?? '';
+    final text = stripFileCitations(raw);
     final streaming = row['state'] == 'streaming';
     final actions = row['actions'] as Map? ?? const {};
     final feedback = row['feedback'] as String?;
@@ -180,6 +182,7 @@ class AssistantText extends StatelessWidget {
         )
       else
         MarkdownView(text),
+      if (!streaming) PreviewCards(text: raw),
       if (row['state'] == 'failed' || row['state'] == 'interrupted')
         Padding(
           padding: const EdgeInsets.only(top: 4),

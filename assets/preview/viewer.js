@@ -153,9 +153,35 @@
     return { cx: 16, cy: 9 };
   }
 
+  // Generated decks (python-pptx and friends) often list parts in
+  // [Content_Types].xml that aren't in the package. PowerPoint ignores them;
+  // pptx-preview stops at the first one and shows no slides, so drop them.
+  async function repairPptx(data) {
+    try {
+      const zip = await window.JSZip.loadAsync(data);
+      const types = zip.file('[Content_Types].xml');
+      if (!types) return data;
+      const xml = await types.async('string');
+      let dropped = 0;
+      const fixed = xml.replace(/<Override\b[^>]*\bPartName="\/([^"]+)"[^>]*\/>/g, (m, part) => {
+        let name = part;
+        try { name = decodeURI(part); } catch (_) {}
+        if (zip.file(name) || zip.file(part)) return m;
+        dropped++;
+        return '';
+      });
+      if (!dropped) return data;
+      zip.file('[Content_Types].xml', fixed);
+      return new Uint8Array(await zip.generateAsync({ type: 'arraybuffer' }));
+    } catch (_) {
+      return data;
+    }
+  }
+
   let pptxWidth = 0;
   async function renderPptx(data) {
     await load('pptx-preview.umd.js');
+    data = await repairPptx(data);
     const size = await slideSize(data);
     const draw = async () => {
       pptxWidth = width();

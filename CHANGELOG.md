@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-13
+
+### Added
+- 回复下方的文件卡片（与网页一致）：助手回复里引用的 PPT / Word / Excel / PDF / 视频 / 音频文件（`::zcode-file-citation` 指令、Markdown 链接、`file://` 地址、反引号或引号里的文件名、裸路径，限工作区内）在回复下方显示为卡片，点击在审查 / 终端页面打开预览；回复正文不再显示原始的 citation 指令。
+
+### Fixed
+- 部分生成的 PPTX（`[Content_Types].xml` 里登记了包内并不存在的部件，PowerPoint 会忽略）预览显示「演示文稿加载失败 / no slides」：渲染前先去掉这些悬空登记。
+- 调试版在侧栏点任务后界面卡住（`setState` 回调返回了 Future）。
+
 ## [1.1.0] - 2026-10-13
 
 ### Added

@@ -71,7 +71,10 @@ class _HomePageState extends State<HomePage> {
   void _select(DeviceSession d, String? taskId) {
     final key = _selKey(d);
     if (key == null) return;
-    setState(() => app.setSelection(key, taskId));
+    // setSelection returns a Future, which setState rejects.
+    setState(() {
+      app.setSelection(key, taskId);
+    });
     if (d.workspace != null) app.registry.rememberWorkspace(d.device, d.workspace!.workspace.path);
   }
 
